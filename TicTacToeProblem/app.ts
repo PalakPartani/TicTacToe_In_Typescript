@@ -1,3 +1,5 @@
+import { exit } from "process";
+
 console.log('Welcome to TicTacToe');
 var readLineSync = require('readline-sync');
 //Declared array & variables.
@@ -57,12 +59,40 @@ let userPlay = () => {
         userPlay();
     }
 }
+
+//change sign.
+let switchUser = () => {
+    playerSign == 'X' ? playerSign = 'O' : playerSign = 'X';
+}
 //Playing Game untill game ends.
 let play = () => {
     while (playerMoves < TOTAL_MOVES) {
         userPlay();
         displayBoard();
+        checkCells();
+        switchUser();
     }
+    console.log("tie");
+}
+//checking condition to win.
+let checkWinner = (val1: number, val2: number, val3: number) => {
+        if (val1 == val2 && val1 == val3) {
+            console.log("win");
+            exit();
+        }
+    }
+
+//checking cells.
+let checkCells = () => {
+    let row = 0;
+    let col = 0;
+    for (row = 0; row < 9; row = row + 3) {
+        checkWinner(gameBoard[row], gameBoard[row + 1], gameBoard[row + 2]);
+        checkWinner(gameBoard[col], gameBoard[col + 3], gameBoard[col + 6]);
+        col = col + 1;
+    }
+    checkWinner(gameBoard[0], gameBoard[4], gameBoard[8]);
+    checkWinner(gameBoard[2], gameBoard[4], gameBoard[6]);
 }
 resetBoard();
 assignSignToPlayer();
