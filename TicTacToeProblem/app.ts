@@ -5,9 +5,12 @@ var readLineSync = require('readline-sync');
 //Declared array & variables.
 let gameBoard = new Array();
 let playerSign;
-let playerTurn;
+let playerTurn=0;
+let computer;
+let player;
+let computerTurn;
 let playerMoves = 0;
-let position=1;
+let position = 1;
 //Initializing Constants
 const TOTAL_MOVES = 9;
 
@@ -19,15 +22,28 @@ let resetBoard = () => {
 }
 //Assigning Letter X or O To Player 
 let assignSignToPlayer = () => {
-    if ((Math.random() % 2) == 1) {
-        playerSign = 'X';
-        playerTurn = true;
+        if ((Math.random() % 2) == 0) {
+            player = 'O';
+            computer = 'X';
     }
     else {
-        playerSign = 'O';
-        playerTurn = true;
+        player = 'X';
+        computer = 'O';
     }
-    console.log("The player1 sign is : " + playerSign);
+    console.log("The player sign is : " + player);
+    console.log("The computer sign is : " + computer);
+}
+
+//switcing players
+let switchPlayer = () => {
+    console.log(playerTurn + " pturn ");
+    if (playerTurn == 1) {
+        playerTurnn();
+    }
+    else {
+        computerTurn();
+    }
+    
 }
 //Displaying GameBoard
 let displayBoard = () => {
@@ -36,6 +52,59 @@ let displayBoard = () => {
         console.log("-------------");
         
     }
+}
+
+//player turn
+let playerTurnn = () => {
+    playerTurn = 0;
+    console.log("player sign : " + player);
+    position = readLineSync.question("Enter Position Between 1 to 9 ");
+    if (position >= 1 && position <= 9 && position!=null) {
+        isCellEmpty(position, player);
+    }
+    else {
+        console.log("Enter again");
+        playerTurnn();
+    }
+}
+
+//computer turn
+computerTurn = () => {
+        console.log("computer sign : " + computer);
+        playerTurn = 1;
+    position = Math.floor((Math.random() * 9)+1);
+    console.log(position);
+    console.log(computer);
+    if (position >= 1 && position <= 9 && position != null) {
+        isCellEmpty(position, computer);
+    }
+    else {
+        console.log("c played ...");
+        computerTurn();
+    }
+
+}
+//checking Position is already filled or blank
+let isCellEmpty = (position:number,signn:string) => {
+    let pos = position - 1;
+    console.log(pos);
+    let sign = signn;
+    console.log(gameBoard[pos]);
+    if (gameBoard[pos] != 'X' && gameBoard[pos] != 'O') {
+        gameBoard[pos] = sign;
+        playerMoves++;
+    }
+    else {
+        console.log("Already occupied");
+        console.log("Please enter again");
+        if (playerTurn == 1) {
+            computerTurn();
+        }
+        else {
+            playerTurnn();
+        }
+    }
+
 }
 //positionIsOccupied
 let positionIsOccupied = (position: number) => {
@@ -66,11 +135,14 @@ let switchUser = () => {
 }
 //Playing Game untill game ends.
 let play = () => {
+    resetBoard();
+    assignSignToPlayer();
     while (playerMoves < TOTAL_MOVES) {
-        userPlay();
+        //userPlay();
         displayBoard();
         checkCells();
-        switchUser();
+        switchPlayer();
+       // switchUser();
     }
     console.log("tie");
 }
@@ -94,6 +166,5 @@ let checkCells = () => {
     checkWinner(gameBoard[0], gameBoard[4], gameBoard[8]);
     checkWinner(gameBoard[2], gameBoard[4], gameBoard[6]);
 }
-resetBoard();
-assignSignToPlayer();
+
 play();
