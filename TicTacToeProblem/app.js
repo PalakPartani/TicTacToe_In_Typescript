@@ -5,13 +5,12 @@ console.log('Welcome to TicTacToe');
 var readLineSync = require('readline-sync');
 //Declared array & variables.
 let gameBoard = new Array();
-let playerSign;
 let playerTurn = 0;
 let computer;
 let player;
-let computerTurn;
 let playerMoves = 0;
 let position = 1;
+var flag = 0;
 //Initializing Constants
 const TOTAL_MOVES = 9;
 //Resetting Game Board By Initilizing Array With Default Value
@@ -22,7 +21,7 @@ let resetBoard = () => {
 };
 //Assigning Letter X or O To Player 
 let assignSignToPlayer = () => {
-    if ((Math.random() % 2) == 0) {
+    if (Math.round(Math.random() % 2) == 0) {
         player = 'O';
         computer = 'X';
     }
@@ -32,52 +31,248 @@ let assignSignToPlayer = () => {
     }
     console.log("The player sign is : " + player);
     console.log("The computer sign is : " + computer);
-};
-//switcing players
-let switchPlayer = () => {
-    console.log(playerTurn + " pturn ");
-    if (playerTurn == 1) {
+    if (player == 'X') {
         playerTurnn();
     }
-    else {
+    else
         computerTurn();
+};
+//switching players
+let switchPlayer = () => {
+    console.log(playerTurn + " player turn ");
+    if (playerTurn == 1) {
+        computerTurn();
+        //  playerTurnn();
+    }
+    else if (playerTurn == 0) {
+        playerTurnn();
+        //  computerTurn();
     }
 };
 //Displaying GameBoard
 let displayBoard = () => {
     for (var i = 0; i < 9; i = i + 3) {
-        console.log("|" + gameBoard[i] + "|" + gameBoard[i + 1] + "|" + gameBoard[i + 2]);
+        console.log(gameBoard[i] + "|" + gameBoard[i + 1] + "|" + gameBoard[i + 2]);
         console.log("-------------");
     }
 };
 //player turn
 let playerTurnn = () => {
-    playerTurn = 0;
+    //change 
+    playerTurn = 1;
     console.log("player sign : " + player);
     position = readLineSync.question("Enter Position Between 1 to 9 ");
     if (position >= 1 && position <= 9 && position != null) {
         isCellEmpty(position, player);
+        checkCells(player);
     }
     else {
         console.log("Enter again");
         playerTurnn();
     }
 };
+//SmartMove.
+let smartMove = (val1, val2, val3, sign) => {
+    let c1 = val1;
+    let c2 = val2;
+    let c3 = val3;
+    checkWinner(c1, c2, c3, computer);
+    //console.log("....." + c1);
+    for (var i = 0; i < 3; i++) {
+        if ((gameBoard[c1] == gameBoard[c2]) && (gameBoard[c1] == computer)) {
+            if ((gameBoard[c3] != player) && (flag == 0)) {
+                gameBoard[c3] = computer;
+                playerMoves++;
+                console.log("Computer move");
+                console.log("smart move");
+                checkWinner(c1, c2, c3, computer);
+                flag = 1;
+                break;
+            }
+            // return 1;
+        }
+        else if (((gameBoard[c1] == gameBoard[c3]) && (gameBoard[c1] == player))) {
+            if ((gameBoard[c2] != player) && (flag == 0)) {
+                gameBoard[c2] = computer;
+                playerMoves++;
+            }
+            // gameBoard[c3] = gameBoard[c2] = gameBoard[c1]=computer;
+            console.log("Computer move");
+            console.log("midle of player");
+            checkWinner(c1, c2, c3, computer);
+            flag = 1;
+            //  gameBoard[c3] = gameBoard[c2] = gameBoard[c1]=sign;
+            break;
+        }
+        else if ((gameBoard[0] == 1) || (gameBoard[2] == 3) || (gameBoard[6] == 7) || (gameBoard[8] == 9)) {
+            let arr = [0, 2, 6, 8];
+            let random = Math.floor(Math.random() * arr.length);
+            console.log("........b4 while..random val " + random);
+            while (gameBoard[arr[random]] == computer) {
+                random = Math.floor(Math.random() * arr.length);
+            }
+            while (gameBoard[arr[random]] != computer) {
+                console.log("..........random val " + random);
+                if ((gameBoard[arr[random]] != player) && (gameBoard[arr[random]] != computer) && (flag == 0)) {
+                    gameBoard[arr[random]] = computer;
+                    console.log("Computer move");
+                    console.log("Corner");
+                    checkWinner(c1, c2, c3, computer);
+                    flag = 1;
+                    playerMoves++;
+                    break;
+                }
+                random = Math.floor(Math.random() * arr.length);
+            }
+            break;
+        }
+        let temp = c1;
+        c1 = c2;
+        c2 = c3;
+        c3 = temp;
+    }
+};
+let smartMoveWin = (val1, val2, val3, sign) => {
+    let c1 = val1;
+    let c2 = val2;
+    let c3 = val3;
+    checkWinner(c1, c2, c3, computer);
+    //console.log("....." + c1);
+    for (var i = 0; i < 3; i++) {
+        if ((gameBoard[c1] == gameBoard[c2]) && (gameBoard[c1] == computer)) {
+            if ((gameBoard[c3] != player) && (flag == 0)) {
+                gameBoard[c3] = computer;
+                playerMoves++;
+                console.log("Computer move");
+                console.log("smart move");
+                //checkWinner(c1, c2, c3, computer);
+                flag = 1;
+                break;
+            }
+        }
+        let temp = c1;
+        c1 = c2;
+        c2 = c3;
+        c3 = temp;
+    }
+};
+let smartMoveBlock = (val1, val2, val3, sign) => {
+    let c1 = val1;
+    let c2 = val2;
+    let c3 = val3;
+    checkWinner(c1, c2, c3, computer);
+    //console.log("....." + c1);
+    for (var i = 0; i < 3; i++) {
+        // return 1;
+        if (((gameBoard[c1] == gameBoard[c3]) && (gameBoard[c1] == player))) {
+            if ((gameBoard[c2] != player) && (flag == 0)) {
+                gameBoard[c2] = computer;
+                playerMoves++;
+            }
+            // gameBoard[c3] = gameBoard[c2] = gameBoard[c1]=computer;
+            console.log("Computer move");
+            console.log("midle of player");
+            //checkWinner(c1, c2, c3, computer);
+            flag = 1;
+            //  gameBoard[c3] = gameBoard[c2] = gameBoard[c1]=sign;
+            break;
+        }
+        let temp = c1;
+        c1 = c2;
+        c2 = c3;
+        c3 = temp;
+    }
+};
+let smartMoveCorner = (val1, val2, val3, sign) => {
+    let c1 = val1;
+    let c2 = val2;
+    let c3 = val3;
+    checkWinner(c1, c2, c3, computer);
+    //console.log("....." + c1);
+    for (var i = 0; i < 3; i++) {
+        if ((gameBoard[0] == 1) || (gameBoard[2] == 3) || (gameBoard[6] == 7) || (gameBoard[8] == 9)) {
+            let arr = [0, 2, 6, 8];
+            let random = Math.floor(Math.random() * arr.length);
+            console.log("........b4 while..random val " + random);
+            while (gameBoard[arr[random]] == computer) {
+                random = Math.floor(Math.random() * arr.length);
+            }
+            while (gameBoard[arr[random]] != computer) {
+                console.log("..........random val " + random);
+                if ((gameBoard[arr[random]] != player) && (gameBoard[arr[random]] != computer) && (flag == 0)) {
+                    gameBoard[arr[random]] = computer;
+                    console.log("Computer move");
+                    console.log("Corner");
+                    //checkWinner(c1, c2, c3, computer);
+                    flag = 1;
+                    playerMoves++;
+                    break;
+                }
+                random = Math.floor(Math.random() * arr.length);
+            }
+            break;
+        }
+        let temp = c1;
+        c1 = c2;
+        c2 = c3;
+        c3 = temp;
+    }
+};
+//sidemove
+let smartMoveSide = (val, computer) => {
+    if ((gameBoard[val] != computer) && (gameBoard[val] != player) && (flag == 0)) {
+        gameBoard[val] = computer;
+        flag = 1;
+        playerMoves++;
+    }
+};
 //computer turn
-computerTurn = () => {
-    //if ()
+let computerTurn = () => {
     console.log("computer sign : " + computer);
-    playerTurn = 1;
-    position = Math.floor((Math.random() * 9) + 1);
+    playerTurn = 0;
+    flag = 0;
+    //smart move win
+    let row;
+    let col = 0;
+    for (row = 0; row < 7; row += 3) {
+        console.log("Comp ...." + computer);
+        smartMoveWin(row, row + 1, row + 2, computer);
+        smartMoveWin(col, col + 3, col + 6, computer);
+        col++;
+    }
+    //smart move Block
+    col = 0;
+    for (row = 0; row < 7; row += 3) {
+        console.log("Comp ...." + computer);
+        smartMoveBlock(row, row + 1, row + 2, computer);
+        smartMoveBlock(col, col + 3, col + 6, computer);
+        col++;
+    }
+    //smart move Corner
+    col = 0;
+    for (row = 0; row < 7; row += 3) {
+        console.log("Comp ...." + computer);
+        smartMoveCorner(row, row + 1, row + 2, computer);
+        smartMoveCorner(col, col + 3, col + 6, computer);
+        col++;
+    }
+    //smart center
+    if ((gameBoard[4] == 5) && (flag == 0)) {
+        flag = 1;
+        gameBoard[4] = computer;
+        playerMoves++;
+    }
+    //smart move side
+    smartMoveSide(1, computer);
+    smartMoveSide(3, computer);
+    smartMoveSide(5, computer);
+    smartMoveSide(7, computer);
+    checkCells(computer);
+    if (flag == 0) {
+        isCellEmpty(Math.floor((Math.random() * 8) + 1), computer);
+    }
     console.log(position);
     console.log(computer);
-    if (position >= 1 && position <= 9 && position != null) {
-        isCellEmpty(position, computer);
-    }
-    else {
-        console.log("c played ...");
-        computerTurn();
-    }
 };
 //checking Position is already filled or blank
 let isCellEmpty = (position, signn) => {
@@ -87,12 +282,13 @@ let isCellEmpty = (position, signn) => {
     console.log(gameBoard[pos]);
     if (gameBoard[pos] != 'X' && gameBoard[pos] != 'O') {
         gameBoard[pos] = sign;
+        displayBoard();
         playerMoves++;
     }
     else {
         console.log("Already occupied");
         console.log("Please enter again");
-        if (playerTurn == 1) {
+        if (playerTurn == 0) {
             computerTurn();
         }
         else {
@@ -100,63 +296,64 @@ let isCellEmpty = (position, signn) => {
         }
     }
 };
-//positionIsOccupied
-let positionIsOccupied = (position) => {
-    let pos = position - 1;
-    if (gameBoard[pos] != playerSign) {
-        gameBoard[pos] = playerSign;
-        playerMoves++;
-    }
-    else {
-        console.log("Position Filled");
-    }
-};
-//user playing.
-let userPlay = () => {
-    let position = readLineSync.question("Enter Position Between 1 to 9 : ");
-    if (position >= 1 && position <= 9) {
-        positionIsOccupied(position);
-    }
-    else {
-        console.log("Invalid Position");
-        userPlay();
+//checking condition to win.
+let checkWinner = (v1, v2, v3, sign) => {
+    /*  console.log("Inside checkwinner : " + gameBoard[v1]);
+      console.log("Inside checkwinner : " + gameBoard[v2]);
+      console.log("Inside checkwinner : " + gameBoard[v3]);*/
+    if ((gameBoard[v1] == gameBoard[v2]) && (gameBoard[v1] == gameBoard[v3])) {
+        if (gameBoard[v1] == computer) {
+            console.log("computer win");
+        }
+        else {
+            console.log("player win");
+        }
+        console.log("The comp sign  " + sign);
+        gameBoard[v1] = gameBoard[v2] = gameBoard[v3];
+        displayBoard();
+        process_1.exit();
     }
 };
-//change sign.
-let switchUser = () => {
-    playerSign == 'X' ? playerSign = 'O' : playerSign = 'X';
+//checking cells.
+let checkCells = (sign) => {
+    console.log("In checkcellllllllll" + sign);
+    //console.log("Inside checkcell() " + playerTurn);
+    if (playerTurn == 1) {
+        let row = 0;
+        let col = 0;
+        for (row = 0; row < 7; row += 3) {
+            checkWinner(row, row + 1, row + 2, player);
+            checkWinner(col, col + 3, col + 6, player);
+            col++;
+        }
+        checkWinner(0, 4, 8, player);
+        checkWinner(2, 4, 6, player);
+    }
+    else {
+        let row;
+        let col = 0;
+        for (row = 0; row < 7; row += 3) {
+            console.log("Comp ...." + sign);
+            checkWinner(row, row + 1, row + 2, computer);
+            checkWinner(col, col + 3, col + 6, computer);
+            col++;
+        }
+        checkWinner(0, 4, 8, computer);
+        checkWinner(2, 4, 6, computer);
+    }
 };
 //Playing Game untill game ends.
 let play = () => {
     resetBoard();
     assignSignToPlayer();
     while (playerMoves < TOTAL_MOVES) {
-        //userPlay();
+        // clear();
         displayBoard();
-        checkCells();
         switchPlayer();
-        // switchUser();
     }
+    displayBoard();
     console.log("tie");
 };
-//checking condition to win.
-let checkWinner = (val1, val2, val3) => {
-    if (val1 == val2 && val1 == val3) {
-        console.log("win");
-        process_1.exit();
-    }
-};
-//checking cells.
-let checkCells = () => {
-    let row = 0;
-    let col = 0;
-    for (row = 0; row < 9; row = row + 3) {
-        checkWinner(gameBoard[row], gameBoard[row + 1], gameBoard[row + 2]);
-        checkWinner(gameBoard[col], gameBoard[col + 3], gameBoard[col + 6]);
-        col = col + 1;
-    }
-    checkWinner(gameBoard[0], gameBoard[4], gameBoard[8]);
-    checkWinner(gameBoard[2], gameBoard[4], gameBoard[6]);
-};
+//main start
 play();
 //# sourceMappingURL=app.js.map
